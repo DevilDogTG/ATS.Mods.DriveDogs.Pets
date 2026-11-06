@@ -1,0 +1,10 @@
+build/
+output/
+__pycache__/
+.claude/
+# Converted game files come from the pipeline (the pinned ETS2 release), never committed.
+*.pmd
+*.pmg
+*.pma
+*.pmc
+*.dds
