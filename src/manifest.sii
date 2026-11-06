@@ -1,0 +1,14 @@
+SiiNunit
+{
+mod_package : .package_name
+{
+	package_version: "9.2.0"
+	display_name: "DriveDogs: Pets"
+	author: "DevilDogTG"
+	category[]: "interior"
+	icon: "cover.jpg"
+	description_file: "description.txt"
+
+	mp_mod_optional: true
+}
+}
