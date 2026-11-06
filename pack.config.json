@@ -1,0 +1,1 @@
+{ "packageName": "drivedog_pets", "game": "ats", "prePack": ["python tools/import_ets2.py --check"] }

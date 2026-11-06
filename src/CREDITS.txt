@@ -1,0 +1,54 @@
+DriveDogs: Pets - credits
+
+Personal build, not for redistribution. Every model belongs to its authors; this pack only adapts
+them for the truck cab. Each entry lists the model used, then what it was made from.
+
+Bicolor Cat
+  model: "Bicolor Cat" by kenchoo, https://sketchfab.com/3d-models/e623a618ca344a8393d7ba4d63ec23cf, CC BY 4.0
+  made from: "3d modelling my cat: Fripouille" by guillaume bolis, https://sketchfab.com/3d-models/0ab14bf98e754f8d90fe1bf1c84ca66c, CC BY 4.0
+  changes: joints moved to where the mesh bends and the skin repaired on a standing base model (the torso weighted to its spine - the download skins it to the hind knees and the tail); posed for the truck cab on its own rig, textures converted to DDS
+
+Border Collie
+  model: "Fallout 4 dogs (bed and seat)" by willet, https://steamcommunity.com/sharedfiles/filedetails/?id=2997276736, Steam Workshop mod
+  made from: "Fallout 4" by Bethesda Game Studios, original game models
+  changes: re-rigged from willet's sitting game model - stood up as a base model, joints and skin repaired, posed for the truck cab on its own rig
+
+Boon
+  model: "Bull Terrier" by kenchoo, https://sketchfab.com/3d-models/b5edaaa979c946f4988ac4123dd41dc1, CC BY 4.0
+  made from: "Bull Terrier 3D Model" by real_slimshady, https://sketchfab.com/3d-models/cd3ab1d8e0764caca85ebd584261944d, CC BY 4.0
+  changes: made into a young puppy (head, muzzle, legs, body re-proportioned) and recoloured after the owner's dog Boon (white with black ears, a black patch over the left eye and one on the right hip); posed for the truck cab on its own rig, textures converted to DDS
+
+Bull Terrier
+  model: "Bull Terrier" by kenchoo, https://sketchfab.com/3d-models/b5edaaa979c946f4988ac4123dd41dc1, CC BY 4.0
+  made from: "Bull Terrier 3D Model" by real_slimshady, https://sketchfab.com/3d-models/cd3ab1d8e0764caca85ebd584261944d, CC BY 4.0
+  changes: posed for the truck cab on its own rig (posed by hand after reference photos, with breathing loops and a tail wag), the model edited per pose (neck lengthened, throat and left front leg re-weighted), rescaled, textures converted to DDS
+
+Golden Retriever
+  model: "Golden Retriever Dog 3d model free" by rt699448 (iRahulRajput), https://sketchfab.com/3d-models/4d32f856099c4baca05da2da485c24c1, CC BY 4.0
+  changes: rigged with the COTW labrador's skeleton (joints moved to where the mesh bends, skin re-made per limb, tail skinned along its chain, a breathing bone added along the back), posed and animated for the truck cab (breathing, looks, head cocks, wagging and a light pant), decimated, rescaled, textures converted to DDS
+
+German Shepherd
+  model: "Fallout 4 dogs (bed and seat)" by willet, https://steamcommunity.com/sharedfiles/filedetails/?id=2997276736, Steam Workshop mod
+  made from: "Fallout 4" by Bethesda Game Studios, original game models (Dogmeat)
+  changes: re-rigged from willet's sitting game model - stood up as a base model, collar removed, joints and skin repaired, fur cards added, posed for the truck cab on its own rig
+
+Labrador
+  model: "Labrador dog no description (serioulsy)" by I-I-love-my-dog-Dixie (Dream Dixie Works), https://sketchfab.com/3d-models/42c8f95d9a83481f93e84d706ca03729, CC BY 4.0 (as stated in the file)
+  made from: "Labrador dog from COTW game." by game-ripper, https://sketchfab.com/3d-models/e2e5d0c611fb40cbb2b4883e38916cac, CC BY 4.0 (as stated in the file)
+  made from: "theHunter: Call of the Wild" by Expansive Worlds / Avalanche Studios, original game model
+  changes: posed and animated for the truck cab on its own base model (standing, rescaled, skeleton pruned to the weighted bones, a breathing bone added to the barrel; the sleeping pose posed by hand on its own skeleton), whiskers left out, texture converted to DDS
+
+Puppy
+  model: "Dog Puppy" by kenchoo, https://sketchfab.com/3d-models/72331763040e4314b154f84348fe0957, CC BY 4.0
+  made from: "3d dog cute" by Deepu.Dra, https://sketchfab.com/3d-models/206d1a40d4654d1e940c9ec05b2cc14f, CC BY 4.0
+  changes: posed for the truck cab on its own rig (its own standing idle with a tail wag; sitting, lying and sleeping posed by hand after reference photos, looking around while sitting and lying), a breathing bone added to the barrel, rescaled, texture converted to DDS
+
+Shiba Inu
+  model: "Fallout 4 dogs (bed and seat)" by willet, https://steamcommunity.com/sharedfiles/filedetails/?id=2997276736, Steam Workshop mod
+  made from: "Fallout 4" by Bethesda Game Studios, original game models
+  changes: re-rigged from willet's sitting game model - stood up as a base model, joints and skin repaired, fur cards added, posed for the truck cab on its own rig
+
+Tuay
+  model: "Dog Puppy" by kenchoo, https://sketchfab.com/3d-models/72331763040e4314b154f84348fe0957, CC BY 4.0
+  made from: "3d dog cute" by Deepu.Dra, https://sketchfab.com/3d-models/206d1a40d4654d1e940c9ec05b2cc14f, CC BY 4.0
+  changes: recoloured all black (the fur detail kept); joints moved to where the mesh bends and the skin repaired on a standing base model; posed for the truck cab on its own rig, textures converted to DDS
