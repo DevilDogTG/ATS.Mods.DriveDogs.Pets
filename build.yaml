@@ -1,0 +1,10 @@
+# ATS build settings, read by tools/build_pack.py.
+schema: 1
+
+# The extracted ATS base (extract-reference, this host's reference root) the trucks and their slots are read from.
+base_game:
+  version: "1.62"
+
+# Shop entry of every pet part and table item (as willet's ETS2 mounts the ETS2 pack used).
+price: 1
+unlock: 0

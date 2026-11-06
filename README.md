@@ -15,7 +15,10 @@ version of the ETS2 release it imports.
 |---|---|
 | `import.json` | the imported ETS2 release: version, commit, sha1 of every imported file, the credits |
 | `tools/import_ets2.py` | imports from a clean, built and packed ETS2 Pets checkout into `build/import/` (`--check` verifies it) |
-| `tools/common.py` | repo paths, host API (`megapack`), refuses to run unless `pack.config.json` says `ats` |
+| `tools/build_pack.py` | stages `build/pack/`: imported pets, hookup units, our shells, a def per pose / pair on every ATS truck with its slot, the dashboard-table items; checks the stage (`build/pack-report.md`) |
+| `tools/shells.py` | our locator-only mount shells (`tools/test_shells.py` checks them) |
+| `build.yaml` | the ATS base version the trucks and slots are read from, shop price / unlock |
+| `tools/common.py`, `tools/sii_text.py` | repo paths, host API (`megapack`), refuses to run unless `pack.config.json` says `ats`; SII unit scanner |
 | `src/` | manifest, description, CREDITS.txt (imported) |
 | `docs/adr/` | decision records |
 
@@ -26,7 +29,8 @@ reference root).
 
 1. Import (once per ETS2 release; the ETS2 checkout must be clean and its `build/pack` the stage of that release):
    `python tools/import_ets2.py <ETS2 Pets checkout>`, then set `src/manifest.sii` `package_version` to its version.
-2. Pack with the `pack-mod` skill (`pack.config.json` prePack checks the import first).
+2. Pack with the `pack-mod` skill, `-Root build/pack` (`pack.config.json` prePack checks the shells, then
+   `tools/build_pack.py` checks the import and stages the pack).
 
 ## Requirements
 
