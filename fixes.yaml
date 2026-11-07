@@ -50,3 +50,16 @@ slot_floor:
     westernstar.49x: -0.003
     westernstar.5700xe: 0.001
     westernstar.57x: -0.003
+
+# bed_shift: metres bed pets are moved across the bunk (toybed slot z) on a truck whose mattress is not
+# centred on its toybed locator (build_pack: those trucks get their own shell copies). One shift per
+# truck for all bed pets, measured with `python tools/cab_fit.py bed --sweep --write`.
+bed_shift:
+  freightliner.cascadia2019: 0.160
+  freightliner.cascadia2024: 0.140
+  intnational.9900i: 0.140
+  kenworth.t680: 0.060
+  peterbilt.389: 0.180
+  peterbilt.579: 0.100
+  westernstar.49x: 0.100
+  westernstar.57x: 0.100
