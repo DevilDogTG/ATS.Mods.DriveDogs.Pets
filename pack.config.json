@@ -1,1 +1,1 @@
-{ "packageName": "drivedog_pets", "game": "ats", "prePack": ["python tools/test_shells.py", "python tools/build_pack.py"] }
+{ "packageName": "drivedog_pets", "game": "ats", "prePack": ["python tools/test_shells.py", "python tools/generate_cover.py", "python tools/build_pack.py"] }

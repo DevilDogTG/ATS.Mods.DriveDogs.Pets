@@ -202,7 +202,7 @@ def main() -> int:
         stage_file(path, data, owner, owners, clashes)
     problems = verify_stage(base)
     if not (STAGE / "cover.jpg").is_file():
-        notes["warnings"].append("src/cover.jpg is missing (manifest icon)")
+        problems.append("src/cover.jpg is missing (manifest icon; run tools/generate_cover.py)")
 
     lock = json.loads((REPO / "import.json").read_text(encoding="utf-8"))["ets2"]
     by_owner: dict[str, int] = defaultdict(int)

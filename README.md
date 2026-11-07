@@ -17,9 +17,10 @@ version of the ETS2 release it imports.
 | `tools/import_ets2.py` | imports from a clean, built and packed ETS2 Pets checkout into `build/import/` (`--check` verifies it) |
 | `tools/build_pack.py` | stages `build/pack/`: imported pets, hookup units, our shells, a def per pose / pair on every ATS truck with its slot, the dashboard-table items; checks the stage (`build/pack-report.md`) |
 | `tools/shells.py` | our locator-only mount shells (`tools/test_shells.py` checks them) |
+| `tools/generate_cover.py` | `src/cover.jpg` (the Mod Manager icon): the DriveDogs cover with the ATS badge and the imported shepherd's sit pose (`pma_pose.py` + `pmg_preview.py`) |
 | `build.yaml` | the ATS base version the trucks and slots are read from, shop price / unlock |
 | `tools/common.py`, `tools/sii_text.py` | repo paths, host API (`megapack`), refuses to run unless `pack.config.json` says `ats`; SII unit scanner |
-| `src/` | manifest, description, CREDITS.txt (imported) |
+| `src/` | manifest, description, cover, CREDITS.txt (imported) |
 | `docs/adr/` | decision records |
 
 Never in the repo: the imported pet files and everything built (`build/`, `output/`), the extracted base game (host
@@ -29,8 +30,9 @@ reference root).
 
 1. Import (once per ETS2 release; the ETS2 checkout must be clean and its `build/pack` the stage of that release):
    `python tools/import_ets2.py <ETS2 Pets checkout>`, then set `src/manifest.sii` `package_version` to its version.
-2. Pack with the `pack-mod` skill, `-Root build/pack` (`pack.config.json` prePack checks the shells, then
-   `tools/build_pack.py` checks the import and stages the pack).
+2. Pack with the `pack-mod` skill, `-Root build/pack` (`pack.config.json` prePack checks the shells, draws the cover
+   with the manifest version, then `tools/build_pack.py` checks the import and stages the pack). Test builds stay in
+   `output/local/`.
 
 ## Requirements
 
