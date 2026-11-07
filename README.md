@@ -21,6 +21,7 @@ version of the ETS2 release it imports.
 | `tools/cab_fit.py`, `tools/cabs.py` | measures the ATS cabs (base game interiors by variant, co-driver seat accessories): `seat` / `floor` (`--write`: `fixes.yaml`), `bed` (each bed pet on every bunk, % off the mattress) |
 | `tools/generate_cover.py` | `src/cover.jpg` (the Mod Manager icon): the DriveDogs cover with the ATS badge and the imported shepherd's sit pose (`pma_pose.py` + `pmg_preview.py`) |
 | `build.yaml` | the ATS base version the trucks and slots are read from, shop price / unlock |
+| `tools/verify_pack.py` + `tools/petlib/uvs.py` | checks a packed .scs against `build/pack` (same files, every non-texture file identical) and that every model has real UVs |
 | `tools/common.py`, `tools/sii_text.py` | repo paths, host API (`megapack`), refuses to run unless `pack.config.json` says `ats`; SII unit scanner |
 | `src/` | manifest, description, cover, CREDITS.txt (imported) |
 | `docs/adr/` | decision records |
@@ -35,6 +36,7 @@ reference root).
 2. Pack with the `pack-mod` skill, `-Root build/pack` (`pack.config.json` prePack checks the shells, draws the cover
    with the manifest version, then `tools/build_pack.py` checks the import and stages the pack). Test builds stay in
    `output/local/`.
+3. Check the archive against the stage: `python tools/verify_pack.py output/local/drivedog_pets_v<version>.scs`.
 
 ## Requirements
 

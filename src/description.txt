@@ -1,6 +1,6 @@
-DriveDogs: Pets - pets for the truck cab: dogs and cats sitting on the cab floor and the co-driver seat, lying on the seat, sleeping on the bed and on the dashboard tables, on every ATS truck that has the slot.
+DriveDogs: Pets - pets for the truck cab: dogs and a cat sitting on the cab floor and the co-driver seat, lying on the seat, sleeping on the bed and on the dashboard tables, on every ATS truck that has the slot. Each truck gets its own fit: the pets sit on that cab's co-driver cushion and floor and lie on its bunk.
 
-Find them in the truck shop under the interior accessories: bed, seat and big toys (floor), and as dashboard-table items.
+Find them in the truck shop under the interior accessories: bed, seat and big toys (floor), and as dashboard-table items (International 9900i, LoneStar and LT, Mack Anthem and Pinnacle, the older Kenworth T680 and Volvo VNL).
 
 Credits:
 - Bicolor Cat: kenchoo, from guillaume bolis
@@ -15,5 +15,5 @@ Credits:
 - Tuay: kenchoo, from Deepu.Dra
 
 Full credits with links and licences: CREDITS.txt inside the mod.
-The pets are those of DriveDogs: Pets for ETS2 of the same version, carried to American Truck Simulator. Base-game and DLC (SCS) trucks only.
+This version has the Labrador, the Puppy, Tuay (a black Labrador puppy), the Bull Terrier, Boon (a Bull Terrier puppy), the Golden Retriever, the Bicolor Cat and willet's Border Collie, German Shepherd and Shiba Inu, posed and animated (standing, sitting, lying, sleeping): the pets of DriveDogs: Pets for ETS2 of the same version, carried to American Truck Simulator. Base-game and DLC (SCS) trucks only.
 Personal build, not for redistribution: every model belongs to its authors.
