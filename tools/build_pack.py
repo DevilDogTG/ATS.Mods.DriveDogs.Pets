@@ -7,7 +7,8 @@ From the import (tools/import_ets2.py, checked first) this
   4. writes one accessory def per pose / pair on every ATS truck of the base game that has its slot
      (def/vehicle/truck/<truck>/accessory/<slot>/), and the dashboard-table items (mount `addon`) as addon hookups;
      a truck with a measured fix (fixes.yaml: seat_centre moves seat poses onto its cushion, slot_floor raises floor
-     pets to its floor; tools/cab_fit.py) gets its own shell copy, the others share one,
+     pets to its floor, bed_shift moves bed pets across its bunk; tools/cab_fit.py) gets its own shell copy, the
+     others share one,
   5. checks the stage: every referenced path exists in the stage or the game, every SII parses, every shell names a
      staged hookup.
 
@@ -104,13 +105,15 @@ def _mm(value: float) -> str:
 def truck_offset(fixes: dict, item: dict, truck: str, slot: str) -> tuple[tuple[float, float, float], str]:
     """fixes.yaml for one item on one truck: (offset in the slot's frame, the tag its own shell copy carries; ""
     when there is no fix: the shared shell). slot_floor raises any part in the slot; seat_centre moves seat poses (as
-    ETS2: pairs are never on the seat)."""
+    ETS2: pairs are never on the seat); bed_shift moves bed poses and pairs across the bunk."""
     lift = float(((fixes.get("slot_floor") or {}).get(slot) or {}).get(truck, 0.0))
     seat = (0.0, 0.0)
     if slot == "toyseat" and item["kind"] == "pose":
         seat = tuple((fixes.get("seat_centre") or {}).get(truck) or (0.0, 0.0))
-    tag = (f"_y{_mm(lift)}" if lift else "") + (f"_c{_mm(seat[0])}{_mm(seat[1])}" if any(seat) else "")
-    return (seat[0], lift, seat[1]), tag
+    bed = float((fixes.get("bed_shift") or {}).get(truck, 0.0)) if slot == "toybed" else 0.0
+    tag = ((f"_y{_mm(lift)}" if lift else "") + (f"_c{_mm(seat[0])}{_mm(seat[1])}" if any(seat) else "")
+           + (f"_b{_mm(bed)}" if bed else ""))
+    return (seat[0], lift, seat[1] + bed), tag
 
 
 def stage_file(path: str, data: bytes | Path, owner: str, owners: dict[str, str], clashes: list[str]) -> None:

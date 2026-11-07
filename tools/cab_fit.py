@@ -6,16 +6,18 @@
          locator within 20 cm of it - fixes.yaml slot_floor, what build_pack raises floor pets by.
   bed    each bed pose / pair (or one token) as its shell places it at frame 0, laid on every ATS bunk (each interior
          with a toybed locator): the share of its footprint off the mattress (the flat surface at the locator's height
-         reachable from the locator without crossing anything 3-40 cm above it). Report only: pets are never re-posed
-         here.
+         reachable from the locator without crossing anything 3-40 cm above it). --sweep: per truck, the one shift
+         across the bunk that fits all its bed pets best - fixes.yaml bed_shift. Pets are never re-posed here, only
+         moved as a whole.
 
-seat --write / floor --write rewrite that block of fixes.yaml (a truck's value is the mean over its interiors). The
+seat / floor / bed --sweep with --write rewrite that block of fixes.yaml (a truck's value is the mean over its interiors). The
 measuring code (cushion, floor, mattress) is copied from the ETS2 Pets repo's tools/pose_check.py `seat`, `floor` and
 `bed` (ADR 0001); the cab lists are the ATS interiors instead of hand-kept lists, LHD only (ATS has no UK cabs).
 
 Usage: python tools/cab_fit.py seat [--write]
        python tools/cab_fit.py floor [--write]
        python tools/cab_fit.py bed [<token>]
+       python tools/cab_fit.py bed --sweep [--write]
 """
 from __future__ import annotations
 
@@ -278,6 +280,38 @@ def beds(cabs: dict[str, list[Interior]], only: str | None) -> None:
         print(f"  no mattress found at the locator: {len(missing)}: " + "; ".join(missing))
 
 
+BED_SHIFTS = range(-6, 22, 2)  # cm along the slot's z (across the bunk)
+
+
+def bed_sweep(cabs: dict[str, list[Interior]]) -> dict[str, float]:
+    """One shift across the bunk (slot z) per truck for all its bed pets: where a truck's mattress is not centred on
+    its toybed locator (the big dogs hang off one edge), the shift in BED_SHIFTS with the lowest worst share off the
+    mattress over all bed pets and bunks (whole %), the smallest one on a tie. Trucks whose pets all fit (<= 2 % off)
+    keep 0."""
+    items = bed_items()
+    found = {}
+    for truck, rows in cabs.items():
+        bunks = [m for interior in rows if (m := mattress(interior)) is not None and m[2].any()]
+        if not bunks:
+            continue
+
+        def worst(dz: float) -> tuple[float, str]:
+            shares = [(off_bed(pts + np.array([0.0, 0.0, dz / 100]), q, free), token)
+                      for token, pts in items.items() for q, _, free in bunks]
+            return max(shares)
+
+        now = worst(0)
+        if now[0] <= 0.02:
+            print(f"  {truck:26s} all bed pets fit ({len(bunks)} bunks, worst {now[0]:.0%} {now[1]})")
+            continue
+        best = min(BED_SHIFTS, key=lambda dz: (round(worst(dz)[0] * 100), abs(dz)))
+        after = worst(best)
+        found[truck] = best / 100
+        print(f"  {truck:26s} worst {now[0]:4.0%} ({now[1]}) -> shift z {best:+d} cm: worst {after[0]:4.0%} ({after[1]}),"
+              f" {len(bunks)} bunks")
+    return found
+
+
 # ------------------------------------------------------------------------------------------------- fixes.yaml
 def write_block(key: str, comment: list[str], lines: list[str]) -> None:
     """Replace fixes.yaml's `key` block (its comment above it included) with this one."""
@@ -310,6 +344,14 @@ def main(argv: list[str]) -> int:
                 "# locator height (build_pack: those trucks get their own shell copies). Mean over the truck's interiors,",
                 "# measured with `python tools/cab_fit.py floor --write`."],
                 ["  toybig:"] + [f"    {t}: {v:.3f}" for t, v in found.items()])
+    elif "--sweep" in argv:
+        found = bed_sweep(cabs)
+        if write:
+            write_block("bed_shift", [
+                "# bed_shift: metres bed pets are moved across the bunk (toybed slot z) on a truck whose mattress is not",
+                "# centred on its toybed locator (build_pack: those trucks get their own shell copies). One shift per",
+                "# truck for all bed pets, measured with `python tools/cab_fit.py bed --sweep --write`."],
+                [f"  {t}: {v:.3f}" for t, v in found.items()])
     else:
         beds(cabs, next((a for a in argv[2:] if not a.startswith("--")), None))
     return 0
