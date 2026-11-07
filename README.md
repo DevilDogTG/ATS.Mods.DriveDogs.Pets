@@ -17,6 +17,8 @@ version of the ETS2 release it imports.
 | `tools/import_ets2.py` | imports from a clean, built and packed ETS2 Pets checkout into `build/import/` (`--check` verifies it) |
 | `tools/build_pack.py` | stages `build/pack/`: imported pets, hookup units, our shells, a def per pose / pair on every ATS truck with its slot, the dashboard-table items; checks the stage (`build/pack-report.md`) |
 | `tools/shells.py` | our locator-only mount shells (`tools/test_shells.py` checks them) |
+| `fixes.yaml` | measured per-truck fixes: `seat_centre` (seat poses onto each truck's co-driver cushion), `slot_floor` (floor pets onto each truck's floor) |
+| `tools/cab_fit.py`, `tools/cabs.py` | measures the ATS cabs (base game interiors by variant, co-driver seat accessories): `seat` / `floor` (`--write`: `fixes.yaml`), `bed` (each bed pet on every bunk, % off the mattress) |
 | `tools/generate_cover.py` | `src/cover.jpg` (the Mod Manager icon): the DriveDogs cover with the ATS badge and the imported shepherd's sit pose (`pma_pose.py` + `pmg_preview.py`) |
 | `build.yaml` | the ATS base version the trucks and slots are read from, shop price / unlock |
 | `tools/common.py`, `tools/sii_text.py` | repo paths, host API (`megapack`), refuses to run unless `pack.config.json` says `ats`; SII unit scanner |

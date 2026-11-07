@@ -5,7 +5,9 @@ From the import (tools/import_ets2.py, checked first) this
   2. writes one animated_hookup unit per pose and per scaled pair member, and the icon materials,
   3. writes our own mount shell (tools/shells.py) per pose and pair, placing each pet as its ETS2 mount does,
   4. writes one accessory def per pose / pair on every ATS truck of the base game that has its slot
-     (def/vehicle/truck/<truck>/accessory/<slot>/), and the dashboard-table items (mount `addon`) as addon hookups,
+     (def/vehicle/truck/<truck>/accessory/<slot>/), and the dashboard-table items (mount `addon`) as addon hookups;
+     a truck with a measured fix (fixes.yaml: seat_centre moves seat poses onto its cushion, slot_floor raises floor
+     pets to its floor; tools/cab_fit.py) gets its own shell copy, the others share one,
   5. checks the stage: every referenced path exists in the stage or the game, every SII parses, every shell names a
      staged hookup.
 
@@ -84,12 +86,31 @@ def addon_unit(unit: str, name: str, icon: str, suitable_for: str, model: str, c
 
 
 def items(poses: list[dict], pairs: list[dict]) -> list[dict]:
-    """Every part the pack offers: one per pose and one per pair / table item, with the pets its shell places."""
+    """Every part the pack offers: one per pose and one per pair / table item, with the pets its shell places
+    (`place(offset)`: moved by `offset` in the slot's frame)."""
     out = [{"token": p["token"], "name": f"{p['name_display']} ({p['label']})", "icon": p["icon"],
-            "mount": p["mount"], "pets": pose_pets(p), "kind": "pose"} for p in poses]
+            "mount": p["mount"], "place": lambda offset=(0.0, 0.0, 0.0), p=p: pose_pets(p, offset), "kind": "pose"}
+           for p in poses]
     out += [{"token": p["token"], "name": f"{p['name_display']} ({p['label']})", "icon": p["icon"],
-             "mount": p["mount"], "pets": pair_pets(p), "kind": "pair"} for p in pairs]
+             "mount": p["mount"], "place": lambda offset=(0.0, 0.0, 0.0), p=p: pair_pets(p, offset), "kind": "pair"}
+            for p in pairs]
     return out
+
+
+def _mm(value: float) -> str:
+    return f"{'p' if value >= 0 else 'm'}{round(abs(value) * 1000):03d}"
+
+
+def truck_offset(fixes: dict, item: dict, truck: str, slot: str) -> tuple[tuple[float, float, float], str]:
+    """fixes.yaml for one item on one truck: (offset in the slot's frame, the tag its own shell copy carries; ""
+    when there is no fix: the shared shell). slot_floor raises any part in the slot; seat_centre moves seat poses (as
+    ETS2: pairs are never on the seat)."""
+    lift = float(((fixes.get("slot_floor") or {}).get(slot) or {}).get(truck, 0.0))
+    seat = (0.0, 0.0)
+    if slot == "toyseat" and item["kind"] == "pose":
+        seat = tuple((fixes.get("seat_centre") or {}).get(truck) or (0.0, 0.0))
+    tag = (f"_y{_mm(lift)}" if lift else "") + (f"_c{_mm(seat[0])}{_mm(seat[1])}" if any(seat) else "")
+    return (seat[0], lift, seat[1]), tag
 
 
 def stage_file(path: str, data: bytes | Path, owner: str, owners: dict[str, str], clashes: list[str]) -> None:
@@ -142,6 +163,7 @@ def main() -> int:
     if run_check():
         raise SystemExit("the import is not as import.json records (see above)")
     config = read_yaml("build.yaml")
+    fixes = read_yaml("fixes.yaml")
     base = base_dir(reference_root(GAME), config["base_game"]["version"])
     if not (base / "_index.sqlite").is_file():
         raise SystemExit(f"{base}: no extracted ATS base {config['base_game']['version']} (extract-reference base)")
@@ -169,10 +191,10 @@ def main() -> int:
     addon_units: list[str] = []
     for item in items(poses, pairs):
         mount = item["mount"]
-        model, files = shell_files(item["token"] + ("_addon" if mount.get("addon") else ""), item["pets"])
+        model, files = shell_files(item["token"] + ("_addon" if mount.get("addon") else ""), item["place"]())
         for path, data in files.items():
             ship[path] = (data, f"shell {item['token']}")
-        hookups = ", ".join(p.hookup for p in item["pets"])
+        hookups = ", ".join(p.hookup for p in item["place"]())
         if mount.get("addon"):
             addon_units += addon_unit(f"{item['token']}.drivedogs.addon_hookup", item["name"], item["icon"],
                                       mount["addon"], model, config)
@@ -181,8 +203,17 @@ def main() -> int:
         slot = mount.get("to_slot", mount["slot"])
         fitted = sorted(t for t, slots in trucks.items() if slot in slots)
         for truck in fitted:
+            offset, tag = truck_offset(fixes, item, truck, slot)
+            truck_model = model
+            if tag:
+                truck_model, files = shell_files(item["token"] + tag, item["place"](offset))
+                for path, data in files.items():
+                    ship[path] = (data, f"shell {item['token']}")
+                notes["per-truck shells (fixes.yaml)"].append(
+                    f"{item['token']} on {truck}: {item['token']}{tag} (x {offset[0]:+.3f}, y {offset[1]:+.3f}, "
+                    f"z {offset[2]:+.3f} m)")
             ship[f"/def/vehicle/truck/{truck}/accessory/{slot}/drivedogs_pet.{item['token']}.sii"] = (
-                part_def(f"{item['token']}.{truck}.{slot}", item["name"], item["icon"], model, config), "defs")
+                part_def(f"{item['token']}.{truck}.{slot}", item["name"], item["icon"], truck_model, config), "defs")
         notes[f"{item['kind']}s in {slot}"].append(f"{item['token']}: {len(fitted)} trucks ({hookups})")
     if addon_units:
         ship["/def/vehicle/addon_hookups/drivedogs_pets.sui"] = (crlf(addon_units + [""]), "table items")

@@ -1,0 +1,52 @@
+# Measured fixes applied by tools/build_pack.py.
+schema: 1
+
+# seat_centre: where each truck's co-driver seat cushion is, in its toyseat slot frame (metres: x forward,
+# z sideways; ATS cabs are left-hand drive only): seat poses are moved there (build_pack, their shell
+# locators), after their mount `move` brought each pose's rest point to the slot. Mean over the truck's
+# interiors, measured with `python tools/cab_fit.py seat --write`.
+seat_centre:
+  freightliner.cascadia2019: [-0.030, 0.004]
+  freightliner.cascadia2024: [-0.030, 0.005]
+  intnational.9900i: [-0.030, 0.005]
+  intnational.lonestar: [-0.038, -0.011]
+  intnational.lt: [-0.038, -0.011]
+  kenworth.t680: [0.005, -0.010]
+  kenworth.t680_2022: [-0.010, -0.015]
+  kenworth.w900: [-0.030, 0.025]
+  mack.anthem: [-0.035, 0.000]
+  mack.pinnacle: [-0.035, 0.000]
+  peterbilt.389: [-0.030, 0.000]
+  peterbilt.579: [-0.038, -0.010]
+  volvo.vnl: [-0.025, -0.015]
+  volvo.vnl2018: [-0.045, 0.000]
+  volvo.vnl2025: [-0.025, 0.000]
+  volvo.vnr_e: [-0.045, 0.000]
+  westernstar.49x: [-0.015, -0.008]
+  westernstar.5700xe: [-0.010, -0.020]
+  westernstar.57x: [-0.015, -0.008]
+
+# slot_floor: metres a part placed in a slot is raised on a truck whose floor is not at that slot's
+# locator height (build_pack: those trucks get their own shell copies). Mean over the truck's interiors,
+# measured with `python tools/cab_fit.py floor --write`.
+slot_floor:
+  toybig:
+    freightliner.cascadia2019: -0.004
+    freightliner.cascadia2024: -0.004
+    intnational.9900i: -0.004
+    intnational.lonestar: 0.002
+    intnational.lt: 0.002
+    kenworth.t680: -0.004
+    kenworth.t680_2022: -0.020
+    kenworth.w900: -0.029
+    mack.anthem: -0.006
+    mack.pinnacle: -0.006
+    peterbilt.389: -0.006
+    peterbilt.579: -0.008
+    volvo.vnl: 0.001
+    volvo.vnl2018: -0.093
+    volvo.vnl2025: -0.031
+    volvo.vnr_e: -0.093
+    westernstar.49x: -0.003
+    westernstar.5700xe: 0.001
+    westernstar.57x: -0.003
