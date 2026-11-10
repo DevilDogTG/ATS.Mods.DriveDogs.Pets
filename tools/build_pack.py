@@ -5,7 +5,9 @@ From the import (tools/import_ets2.py, checked first) this
   2. writes one animated_hookup unit per pose and per scaled pair member, and the icon materials,
   3. writes our own mount shell (tools/shells.py) per pose and pair, placing each pet as its ETS2 mount does,
   4. writes one accessory def per pose / pair on every ATS truck of the base game that has its slot
-     (def/vehicle/truck/<truck>/accessory/<slot>/), and the dashboard-table items (mount `addon`) as addon hookups;
+     (def/vehicle/truck/<truck>/accessory/<slot>/), and the dashboard-table items (mount `addon`) as addon hookups
+     (a pair with `shadow`, ETS2 9.2.1: its shell also holds a still shadow-only copy of each pet and its contact
+     patch, tools/pmg_shadow.py from the imported build/pairs/proxy);
      a truck with a measured fix (fixes.yaml: seat_centre moves seat poses onto its cushion, slot_floor raises floor
      pets to its floor, bed_shift moves bed pets across its bunk; tools/cab_fit.py) gets its own shell copy, the
      others share one,
@@ -13,7 +15,7 @@ From the import (tools/import_ets2.py, checked first) this
      staged hookup.
 
 Copied in parts from the ETS2 Pets repo's tools/build_pack.py (hookup units, icon materials, addon storage, stage
-check). The ETS2 build writes its defs from willet's per-truck mounts; this one writes its own (no willet file ships).
+check, shadow_shell). The ETS2 build writes its defs from willet's per-truck mounts; this one writes its own (no willet file ships).
 
 Output: build/pack/ (src/ + staged files, packed by the pack-mod skill with -Root build/pack) and
 build/pack-report.md. Exits non-zero when the import is not as recorded or the stage check fails.
@@ -33,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import BUILD, GAME, IMPORT, REPO, read_yaml, reference_root, ref_exists, ref_list  # noqa: E402
 from import_ets2 import run_check  # noqa: E402
 from megapack import base_dir  # noqa: E402
+import pmg_shadow  # noqa: E402
 from shells import HEADER, pair_pets, pose_pets, shell_files  # noqa: E402
 from sii_text import check_structure  # noqa: E402
 
@@ -93,7 +96,8 @@ def items(poses: list[dict], pairs: list[dict]) -> list[dict]:
             "mount": p["mount"], "place": lambda offset=(0.0, 0.0, 0.0), p=p: pose_pets(p, offset), "kind": "pose"}
            for p in poses]
     out += [{"token": p["token"], "name": f"{p['name_display']} ({p['label']})", "icon": p["icon"],
-             "mount": p["mount"], "place": lambda offset=(0.0, 0.0, 0.0), p=p: pair_pets(p, offset), "kind": "pair"}
+             "mount": p["mount"], "place": lambda offset=(0.0, 0.0, 0.0), p=p: pair_pets(p, offset), "kind": "pair",
+             "shadow": p.get("shadow")}
             for p in pairs]
     return out
 
@@ -116,6 +120,27 @@ def truck_offset(fixes: dict, item: dict, truck: str, slot: str) -> tuple[tuple[
     return (seat[0], lift, seat[1] + bed), tag
 
 
+def shadow_shell(files: dict[str, bytes], pmd: str, shadow: dict) -> tuple[dict[str, bytes], str]:
+    """A pair with `shadow` (ETS2 9.2.1, as its build_pack shadow_shell): the shell gets a copy of each member at its
+    hookup locator (`only`: shadow-only) from the imported proxy, plus each contact patch with its own decalshadow
+    material; the shell's .pmd names those materials. Returns (the shell's files and the materials, a report note)."""
+    kind = shadow["kind"]
+    meshes = pmg_shadow.load_proxy(IMPORT / "pairs/proxy" / Path(shadow["proxy"]).name)
+    contact = {hookup: patch["quad"] for hookup, patch in (shadow.get("contact") or {}).items()}
+    pmg = pmd[:-4] + ".pmg"
+    out = dict(files)
+    out[pmg], pieces = pmg_shadow.shell_with_proxy(files[pmg], meshes, kind, contact)
+    material, text = pmg_shadow.MATERIALS[kind]
+    materials = [material]
+    out[material] = text.encode("utf-8")
+    for hookup in sorted(contact):
+        path, text, _ = pmg_shadow.contact_material(hookup)
+        materials.append(path)
+        out[path] = text.encode("utf-8")
+    out[pmd] = pmg_shadow.pmd_with_materials(files[pmd], materials, pieces)
+    return out, f"{pieces} piece(s) - {kind} shadow" + (" + contact patch" if contact else "")
+
+
 def stage_file(path: str, data: bytes | Path, owner: str, owners: dict[str, str], clashes: list[str]) -> None:
     """Write one file into the stage; the same path from two owners is a clash unless the bytes are equal."""
     content = data.read_bytes() if isinstance(data, Path) else data
@@ -131,7 +156,7 @@ def stage_file(path: str, data: bytes | Path, owner: str, owners: dict[str, str]
 
 def shell_hookups(data: bytes) -> list[str]:
     h = HEADER.unpack_from(data, 0)
-    return [s.decode("ascii") for s in data[h[21]:h[21] + h[23]].split(b"\0") if s]
+    return [s.decode("ascii") for s in data[h[22]:h[22] + h[23]].split(b"\0") if s]
 
 
 def verify_stage(base: Path) -> list[str]:
@@ -195,6 +220,11 @@ def main() -> int:
     for item in items(poses, pairs):
         mount = item["mount"]
         model, files = shell_files(item["token"] + ("_addon" if mount.get("addon") else ""), item["place"]())
+        if item.get("shadow"):
+            if not mount.get("addon"):
+                raise SystemExit(f"{item['token']}: a shadow on a truck slot pair (per-truck shell copies) is not built")
+            files, note = shadow_shell(files, model, item["shadow"])
+            notes["table item shells with a shadow (pairs.json shadow)"].append(f"{item['token']}: {note}")
         for path, data in files.items():
             ship[path] = (data, f"shell {item['token']}")
         hookups = ", ".join(p.hookup for p in item["place"]())

@@ -14,9 +14,10 @@ version of the ETS2 release it imports.
 | Path | What |
 |---|---|
 | `import.json` | the imported ETS2 release: version, commit, sha1 of every imported file, the credits |
-| `tools/import_ets2.py` | imports from a clean, built and packed ETS2 Pets checkout into `build/import/` (`--check` verifies it) |
+| `tools/import_ets2.py` | imports from a clean, built and packed ETS2 Pets checkout into `build/import/` (`--check` verifies it): the pets, the pairs and the table items' shadow proxies |
 | `tools/build_pack.py` | stages `build/pack/`: imported pets, hookup units, our shells, a def per pose / pair on every ATS truck with its slot, the dashboard-table items; checks the stage (`build/pack-report.md`) |
 | `tools/shells.py` | our locator-only mount shells (`tools/test_shells.py` checks them) |
+| `tools/pmg_shadow.py` + `tools/pmg_scale.py` | the table items' shadow: a still shadow-only copy of the pet and its contact patch put into their shells |
 | `fixes.yaml` | measured per-truck fixes: `seat_centre` (seat poses onto each truck's co-driver cushion), `slot_floor` (floor pets onto each truck's floor) |
 | `tools/cab_fit.py`, `tools/cabs.py` | measures the ATS cabs (base game interiors by variant, co-driver seat accessories): `seat` / `floor` (`--write`: `fixes.yaml`), `bed` (each bed pet on every bunk, % off the mattress) |
 | `tools/generate_cover.py` | `src/cover.jpg` (the Mod Manager icon): the DriveDogs cover with the ATS badge and the imported shepherd's sit pose (`pma_pose.py` + `pmg_preview.py`) |

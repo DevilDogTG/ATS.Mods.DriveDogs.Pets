@@ -5,6 +5,8 @@ Copied from a clean ETS2 Pets checkout whose build is the one it packed (every i
 `build/pack` stage):
   build/pets/out/**, build/pets/models.json    (gather_pets: locked poses, materials, icons)
   build/pairs/out/**, build/pairs/pairs.json   (pairs: pair / table items, their icons and scaled hookups)
+  build/pairs/proxy/*.npz                      (pairs: the still meshes a table item's shell casts its shadow with;
+                                                9.2.1, pairs.json `shadow`; not in the stage, built into the shells)
 into build/import/ (git-ignored), plus src/CREDITS.txt and the "Credits:" lines of src/description.txt. import.json
 (committed) records the ETS2 version and commit and a sha1 per file; the ATS version must equal the ETS2 version.
 
@@ -25,6 +27,7 @@ from common import IMPORT, REPO, manifest_version, sha1, text_sha1
 
 ETS2_REPO = "DevilDogTG/ETS2.Mods.DriveDog.Pets"
 PARTS = {"pets": ("out", "models.json"), "pairs": ("out", "pairs.json")}  # build/<part>/ -> what is imported
+PROXY = "pairs/proxy"  # build/pairs/proxy/*.npz: shadow meshes for build_pack (pmg_shadow), not staged files
 LOCK = REPO / "import.json"
 CREDITS = REPO / "src" / "CREDITS.txt"
 DESCRIPTION = REPO / "src" / "description.txt"
@@ -59,6 +62,8 @@ def source_files(build: Path) -> dict[str, Path]:
         for f in sorted((build / part / folder).rglob("*")):
             if f.is_file():
                 files[f"{part}/{folder}/{f.relative_to(build / part / folder).as_posix()}"] = f
+    for f in sorted((build / PROXY).glob("*.npz")):
+        files[f"{PROXY}/{f.name}"] = f
     return files
 
 
@@ -82,7 +87,7 @@ def check_source(ets2: Path) -> tuple[str, str, dict[str, Path]]:
     for rel in PARTS:
         if not (build / rel / PARTS[rel][1]).is_file():
             raise SystemExit(f"{ets2}: build/{rel}/{PARTS[rel][1]} is missing")
-    stale = [rel for rel, f in files.items() if not rel.endswith(".json")
+    stale = [rel for rel, f in files.items() if rel.split("/")[1] == "out"
              and f.read_bytes() != (stage / rel.split("/", 2)[2]).read_bytes()]
     if stale:
         raise SystemExit(f"{ets2}: {len(stale)} build files differ from the {version} stage (stale build?), "

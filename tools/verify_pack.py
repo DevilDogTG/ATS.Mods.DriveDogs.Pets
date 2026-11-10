@@ -2,7 +2,8 @@
 then file counts must match and every non-texture file must be byte-identical. scs_packer stores a texture beside the
 .tobj that uses it, named after that .tobj, so a .dds kept elsewhere moves: those moves are listed, not failed.
 Every model (.pmg) must have real UVs (8.0.2: up to 8.0.1 every one had UV (0, 0) everywhere - one flat colour per
-material in game).
+material in game). Shadow-only pieces (eut2.shadowonly, never drawn: tools/pmg_shadow.py) have no UVs and are not
+counted.
 
 Usage: python tools/verify_pack.py output/local/drivedog_pets_v<version>.scs
 
@@ -17,9 +18,27 @@ from pathlib import Path
 
 from common import REPO
 from petlib import uvs
+from pmg_preview import _material_paths
+from pmg_shadow import _HEADER, _PIECE
 
 STAGE = REPO / "build" / "pack"
 EXTRACT = REPO / "build" / "verify_extract"
+
+
+def drawn_uv_ranges(pmg: Path) -> list[tuple]:
+    """uvs.pmg_uv_ranges without the shadow-only pieces (their material, in the pack, an eut2.shadowonly effect)."""
+    ranges = uvs.pmg_uv_ranges(pmg)
+    pmd = pmg.with_suffix(".pmd")
+    materials = _material_paths(pmd.read_bytes()) if pmd.is_file() else []
+    data = pmg.read_bytes()
+    h = _HEADER.unpack_from(data, 0)
+    keep = []
+    for i, r in enumerate(ranges):
+        index = _PIECE.unpack_from(data, h[21] + i * _PIECE.size)[4]
+        mat = EXTRACT / materials[index].lstrip("/") if index < len(materials) else None
+        if not (mat and mat.is_file() and mat.read_text(errors="replace").startswith('effect : "eut2.shadowonly')):
+            keep.append(r)
+    return keep
 
 
 def main(argv: list[str]) -> int:
@@ -38,7 +57,7 @@ def main(argv: list[str]) -> int:
     differ = [p for p in sorted(staged & packed) if not p.endswith((".dds", ".tobj"))
               and (STAGE / p).read_bytes() != (EXTRACT / p).read_bytes()]
     # 2026-10-20 (8.0.2): every model up to 8.0.1 shipped with UV (0, 0) on every vertex - one flat colour in game
-    flat = [p for p in sorted(packed) if p.endswith(".pmg") and uvs.flat(uvs.pmg_uv_ranges(EXTRACT / p))]
+    flat = [p for p in sorted(packed) if p.endswith(".pmg") and uvs.flat(drawn_uv_ranges(EXTRACT / p))]
     models = sum(p.endswith(".pmg") for p in packed)
     print(f"stage {len(staged)} files, archive {len(packed)}; textures moved beside their .tobj: {len(moved)}; "
           f"models with real UVs: {models - len(flat)} of {models}")
