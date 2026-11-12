@@ -2,7 +2,7 @@ SiiNunit
 {
 mod_package : .package_name
 {
-	package_version: "9.2.4"
+	package_version: "9.2.5"
 	display_name: "DriveDogs: Pets"
 	author: "DevilDogTG"
 	category[]: "interior"
